@@ -1,8 +1,8 @@
--> Blog & Chat App
--> Under Development - Will be updated
--> ETA: TBD
+# Umbrella Chat - Backend
 
-# Getting Started
+#### -> Blog & Chat App
+#### -> Under Development - Will be updated
+#### -> ETA: H1 of 2024
 
 ### Reference Documentation
 For further reference, please consider the following sections:
