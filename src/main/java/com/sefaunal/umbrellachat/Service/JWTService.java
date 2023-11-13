@@ -58,14 +58,14 @@ public class JWTService {
     }
 
     public String extractUsername(String token) {
-        return String.valueOf(extractClaim(token).get("Subject"));
+        return decodeToken(token).getSubject();
     }
 
     private Date extractExpiration(String token) {
-        return (Date) extractClaim(token).get("ExpiresAt");
+        return decodeToken(token).getExpiresAt();
     }
 
-    private Map<String, Claim> extractClaim(String token) {
+    private DecodedJWT decodeToken(String token) {
         RSAKeyProvider keyProvider = new RSAKeyProvider() {
             @Override
             public RSAPublicKey getPublicKeyById(String keyId) {
@@ -84,11 +84,10 @@ public class JWTService {
         };
 
         Algorithm algorithm = Algorithm.RSA256(keyProvider);
-        DecodedJWT decodedJWT = JWT
+
+        return JWT
                 .require(algorithm)
                 .build()
                 .verify(token);
-
-        return decodedJWT.getClaims();
     }
 }
