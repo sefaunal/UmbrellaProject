@@ -1,7 +1,5 @@
 package com.sefaunal.umbrellachat.Config;
 
-import com.sefaunal.umbrellachat.Model.User;
-import com.sefaunal.umbrellachat.Repository.UserRepository;
 import com.sefaunal.umbrellachat.Service.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * @author github.com/sefaunal
@@ -32,8 +29,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     private final JWTService jwtService;
 
     private final UserDetailsService userDetailsService;
-
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -54,7 +49,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(JWT);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userRepository.findByEmail(userEmail);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(JWT, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

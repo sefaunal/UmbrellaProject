@@ -1,6 +1,6 @@
 package com.sefaunal.umbrellachat.Config;
 
-import com.sefaunal.umbrellachat.Repository.UserRepository;
+import com.sefaunal.umbrellachat.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,11 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return userRepository::findByEmail;
+        return username -> userService.findUserByMail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found!"));
     }
 
     @Bean
