@@ -19,7 +19,7 @@ import java.io.IOException;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-17
+ * @since 2023-09-17
  **/
 
 @Component
@@ -49,7 +49,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(JWT);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(JWT, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

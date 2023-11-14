@@ -7,9 +7,9 @@ import java.security.interfaces.RSAPublicKey;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-17
+ * @since 2023-09-17
  **/
 
 @ConfigurationProperties(prefix = "rsa")
-public record RsaKeyProperties(RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {
+public record RSA256Keys(RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {
 }

@@ -1,9 +1,12 @@
 package com.sefaunal.umbrellachat.Model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +16,7 @@ import java.util.List;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-17
+ * @since 2023-09-17
  **/
 
 @Getter

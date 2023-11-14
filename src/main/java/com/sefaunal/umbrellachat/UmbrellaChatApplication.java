@@ -1,11 +1,11 @@
 package com.sefaunal.umbrellachat;
 
-import com.sefaunal.umbrellachat.Config.RsaKeyProperties;
+import com.sefaunal.umbrellachat.Config.RSA256Keys;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@EnableConfigurationProperties(RsaKeyProperties.class)
+@EnableConfigurationProperties(RSA256Keys.class)
 @SpringBootApplication
 public class UmbrellaChatApplication {
 

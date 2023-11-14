@@ -1,6 +1,5 @@
 package com.sefaunal.umbrellachat.Service;
 
-import com.sefaunal.umbrellachat.Repository.UserRepository;
 import com.sefaunal.umbrellachat.Request.AuthenticationRequest;
 import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
@@ -13,14 +12,14 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-18
+ * @since 2023-09-18
  **/
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -36,7 +35,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
 
-        userRepository.save(user);
+        userService.createUser(user);
         String JWT = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(JWT).build();
     }
@@ -48,7 +47,7 @@ public class AuthService {
                         request.getPassword()
                 )
         );
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        User user = userService.findUserByMail(request.getEmail()).orElseThrow();
         String JWT = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(JWT).build();
     }

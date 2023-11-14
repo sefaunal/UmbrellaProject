@@ -12,13 +12,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-18
+ * @since 2023-09-18
  **/
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     private final JWTAuthFilter jwtAuthFilter;
 

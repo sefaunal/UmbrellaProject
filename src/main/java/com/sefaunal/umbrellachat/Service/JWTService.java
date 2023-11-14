@@ -2,10 +2,9 @@ package com.sefaunal.umbrellachat.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
-import com.sefaunal.umbrellachat.Config.RsaKeyProperties;
+import com.sefaunal.umbrellachat.Config.RSA256Keys;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,18 +14,17 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-17
+ * @since 2023-09-17
  **/
 
 @Service
 @AllArgsConstructor
 public class JWTService {
 
-    private final RsaKeyProperties rsaKeys;
+    private final RSA256Keys rsaKeys;
 
     public String generateToken(Authentication authentication) {
         String userID = ((UserDetails) authentication.getPrincipal()).getUsername();
@@ -58,14 +56,14 @@ public class JWTService {
     }
 
     public String extractUsername(String token) {
-        return String.valueOf(extractClaim(token).get("Subject"));
+        return decodeToken(token).getSubject();
     }
 
     private Date extractExpiration(String token) {
-        return (Date) extractClaim(token).get("ExpiresAt");
+        return decodeToken(token).getExpiresAt();
     }
 
-    private Map<String, Claim> extractClaim(String token) {
+    private DecodedJWT decodeToken(String token) {
         RSAKeyProvider keyProvider = new RSAKeyProvider() {
             @Override
             public RSAPublicKey getPublicKeyById(String keyId) {
@@ -84,11 +82,10 @@ public class JWTService {
         };
 
         Algorithm algorithm = Algorithm.RSA256(keyProvider);
-        DecodedJWT decodedJWT = JWT
+
+        return JWT
                 .require(algorithm)
                 .build()
                 .verify(token);
-
-        return decodedJWT.getClaims();
     }
 }
