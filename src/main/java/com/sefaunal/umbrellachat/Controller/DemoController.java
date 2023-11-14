@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author github.com/sefaunal
- * created on 2023-09-18
+ * @since 2023-09-18
  **/
 
 @RestController
