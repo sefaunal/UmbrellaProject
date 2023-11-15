@@ -1,0 +1,18 @@
+spring:
+  data:
+    mongodb:
+      uri: "Credentials / URI"
+      database: "DB Name"
+
+  banner:
+    location: banner.txt
+
+rsa:
+  rsaPrivateKey: classpath:Keys/private.pem
+  rsaPublicKey: classpath:Keys/public.pem
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+  api-docs:
+    path: /swagger-docs
