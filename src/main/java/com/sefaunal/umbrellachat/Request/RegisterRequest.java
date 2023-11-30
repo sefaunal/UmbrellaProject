@@ -1,5 +1,7 @@
 package com.sefaunal.umbrellachat.Request;
 
+import com.sefaunal.umbrellachat.Annotation.UniqueEmail;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,7 +27,9 @@ public class RegisterRequest {
     @Size(min = 2, max = 75)
     private String lastName;
 
+    @Email
     @NotNull
+    @UniqueEmail
     @Size(min = 2, max = 75)
     private String email;
 
