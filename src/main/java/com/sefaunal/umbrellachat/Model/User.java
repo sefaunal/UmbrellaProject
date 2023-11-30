@@ -26,7 +26,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class User implements UserDetails {
-
     @Id
     private String ID;
 

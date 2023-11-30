@@ -23,7 +23,6 @@ import java.util.Date;
 @Service
 @AllArgsConstructor
 public class JWTService {
-
     private final RSA256Keys rsaKeys;
 
     public String generateToken(Authentication authentication) {
