@@ -11,5 +11,4 @@ import java.security.interfaces.RSAPublicKey;
  **/
 
 @ConfigurationProperties(prefix = "rsa")
-public record RSA256Keys(RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {
-}
+public record RSA256Keys(RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {}
