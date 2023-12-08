@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.sefaunal.umbrellachat.Config.RSA256Keys;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,16 +21,22 @@ import java.util.Date;
  **/
 
 @Service
-@AllArgsConstructor
 public class JWTService {
     private final RSA256Keys rsaKeys;
+
+    @Value("${umbrella.variables.jwt.expire.days}")
+    private Integer JWTExpireDuration;
+
+    public JWTService(RSA256Keys rsaKeys) {
+        this.rsaKeys = rsaKeys;
+    }
 
     public String generateToken(Authentication authentication) {
         String userID = ((UserDetails) authentication.getPrincipal()).getUsername();
 
         return JWT.create()
                 .withSubject(userID)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 24 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWTExpireDuration * 24 * 60 * 1000))
                 .withIssuer("Umbrella Corp.")
                 .withIssuedAt(Instant.now())
                 .sign(Algorithm.RSA256(rsaKeys.rsaPublicKey(), rsaKeys.rsaPrivateKey()));

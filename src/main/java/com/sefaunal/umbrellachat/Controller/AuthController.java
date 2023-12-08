@@ -3,6 +3,8 @@ package com.sefaunal.umbrellachat.Controller;
 import com.sefaunal.umbrellachat.Request.AuthenticationRequest;
 import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Service.AuthService;
+import jakarta.annotation.Nonnull;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 
 @RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
 
@@ -28,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authService.authenticate(request));
+    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request, @Nonnull HttpServletRequest servletRequest) {
+        return ResponseEntity.ok(authService.authenticate(request, servletRequest));
     }
 }

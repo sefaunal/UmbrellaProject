@@ -4,6 +4,7 @@ import com.sefaunal.umbrellachat.Request.AuthenticationRequest;
 import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
 import com.sefaunal.umbrellachat.Model.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,8 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final LoginHistoryService loginHistoryService;
+
     public AuthenticationResponse register(RegisterRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
@@ -39,7 +42,7 @@ public class AuthService {
         return AuthenticationResponse.builder().token(JWT).build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletRequest servletRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -48,6 +51,7 @@ public class AuthService {
         );
         User user = userService.findUserByMail(request.getEmail()).orElseThrow();
         String JWT = jwtService.generateToken(user);
+        loginHistoryService.saveLoginHistory(servletRequest, request.getEmail());
         return AuthenticationResponse.builder().token(JWT).build();
     }
 }
