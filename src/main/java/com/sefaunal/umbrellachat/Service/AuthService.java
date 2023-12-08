@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @author github.com/sefaunal
  * @since 2023-09-18
@@ -51,7 +53,7 @@ public class AuthService {
         );
         User user = userService.findUserByMail(request.getEmail()).orElseThrow();
         String JWT = jwtService.generateToken(user);
-        loginHistoryService.saveLoginHistory(servletRequest, request.getEmail());
+        CompletableFuture.runAsync(() -> loginHistoryService.saveLoginHistory(servletRequest, request.getEmail()));
         return AuthenticationResponse.builder().token(JWT).build();
     }
 }
