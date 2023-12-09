@@ -16,3 +16,9 @@ springdoc:
     path: /swagger
   api-docs:
     path: /swagger-docs
+
+umbrella:
+  variables:
+    jwt:
+      expire:
+        days: 7
