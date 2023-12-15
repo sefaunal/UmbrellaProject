@@ -1,7 +1,9 @@
 package com.sefaunal.umbrellachat.Response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -11,8 +13,10 @@ import java.time.LocalDateTime;
  * @since 2023-11-30
  */
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
     private HttpStatus status;
 

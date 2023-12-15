@@ -1,7 +1,6 @@
 package com.sefaunal.umbrellachat.Util;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.List;
  * @author github.com/sefaunal
  * @since 2023-12-07
  */
+
 public class CommonUtils {
     public static String extractRequestBody(HttpServletRequest request) {
         List<String> messageList = new ArrayList<>();
@@ -39,10 +39,10 @@ public class CommonUtils {
     }
 
     public static String getUserInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            return authentication.getName();
+        try {
+            return SecurityContextHolder.getContext().getAuthentication().getName();
+        } catch (Exception e) {
+            throw new NullPointerException(e.getMessage());
         }
-        return "Not Authenticated";
     }
 }

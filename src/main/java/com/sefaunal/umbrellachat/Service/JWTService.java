@@ -6,7 +6,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.sefaunal.umbrellachat.Config.RSA256Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -31,21 +30,10 @@ public class JWTService {
         this.rsaKeys = rsaKeys;
     }
 
-    public String generateToken(Authentication authentication) {
-        String userID = ((UserDetails) authentication.getPrincipal()).getUsername();
-
-        return JWT.create()
-                .withSubject(userID)
-                .withExpiresAt(new Date(System.currentTimeMillis() + JWTExpireDuration * 24 * 60 * 1000))
-                .withIssuer("Umbrella Corp.")
-                .withIssuedAt(Instant.now())
-                .sign(Algorithm.RSA256(rsaKeys.rsaPublicKey(), rsaKeys.rsaPrivateKey()));
-    }
-
     public String generateToken(UserDetails userDetails) {
         return JWT.create()
                 .withSubject(userDetails.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 24 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWTExpireDuration * 24 * 60 * 1000))
                 .withIssuer("Umbrella Corp.")
                 .withIssuedAt(Instant.now())
                 .sign(Algorithm.RSA256(rsaKeys.rsaPublicKey(), rsaKeys.rsaPrivateKey()));
