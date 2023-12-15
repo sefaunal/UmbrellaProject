@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author github.com/sefaunal
- * @since 2023-09-18
+ * @since 2023-12-15
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
-    private String token;
-    private boolean mfaEnabled;
+public class MFAResponse {
+    private String secret;
+    private String secretImageUri;
 }

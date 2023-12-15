@@ -14,7 +14,6 @@ import java.lang.annotation.Documented;
  * @author github.com/sefaunal
  * @since 2023-11-30
  */
-
 @Documented
 @Constraint(validatedBy = UniqueEmailValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})

@@ -1,6 +1,5 @@
 package com.sefaunal.umbrellachat.Request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,19 +9,14 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author github.com/sefaunal
- * @since 2023-09-18
+ * @since 2023-12-15
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationRequest {
-    @Email
+public class VerificationRequest {
     @NotNull
-    @Size(min = 2, max = 75)
-    private String email;
-
-    @NotNull
-    @Size(min = 4, max = 128)
-    private String password;
+    @Size(min = 6, max = 6)
+    private String mfaCode;
 }

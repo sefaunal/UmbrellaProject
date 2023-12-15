@@ -2,7 +2,6 @@ package com.sefaunal.umbrellachat.Model;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -17,14 +16,12 @@ import java.util.List;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-17
- **/
-
+ */
 @Getter
 @Setter
 @Document
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class User implements UserDetails {
     @Id
     private String ID;
@@ -38,6 +35,10 @@ public class User implements UserDetails {
     private String email;
 
     private String password;
+
+    private String mfaSecret;
+
+    private boolean mfaEnabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
