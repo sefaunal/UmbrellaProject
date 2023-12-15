@@ -17,8 +17,7 @@ import java.util.Date;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-17
- **/
-
+ */
 @Service
 public class JWTService {
     private final RSA256Keys rsaKeys;

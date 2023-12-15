@@ -13,7 +13,6 @@ import java.util.Optional;
  * @author github.com/sefaunal
  * @since 2023-11-14
  */
-
 @Service
 @RequiredArgsConstructor
 public class UserService {

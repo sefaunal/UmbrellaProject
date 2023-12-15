@@ -14,8 +14,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-18
- **/
-
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

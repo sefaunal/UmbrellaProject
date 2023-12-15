@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author github.com/sefaunal
  * @since 2023-12-04
  */
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/loginHistory")

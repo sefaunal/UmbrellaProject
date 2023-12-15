@@ -18,7 +18,6 @@ import java.util.List;
  * @author github.com/sefaunal
  * @since 2023-11-30
  */
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)

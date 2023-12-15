@@ -11,7 +11,6 @@ import java.util.List;
  * @author github.com/sefaunal
  * @since 2023-12-07
  */
-
 public class CommonUtils {
     public static String extractRequestBody(HttpServletRequest request) {
         List<String> messageList = new ArrayList<>();

@@ -12,7 +12,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * @author github.com/sefaunal
  * @since 2023-11-30
  */
-
 public class LogInterceptor implements HandlerInterceptor {
     private static final Logger LOG = LoggerFactory.getLogger(LogInterceptor.class);
 

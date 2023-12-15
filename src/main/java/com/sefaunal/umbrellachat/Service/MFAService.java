@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
  * @author github.com/sefaunal
  * @since 2023-12-14
  */
-
 @Service
 @RequiredArgsConstructor
 public class MFAService {

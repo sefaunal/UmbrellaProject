@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
  * @author github.com/sefaunal
  * @since 2023-11-30
  */
-
 @AllArgsConstructor
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
     private final UserService userService;

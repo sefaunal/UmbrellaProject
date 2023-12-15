@@ -16,8 +16,7 @@ import java.util.List;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-17
- **/
-
+ */
 @Getter
 @Setter
 @Document

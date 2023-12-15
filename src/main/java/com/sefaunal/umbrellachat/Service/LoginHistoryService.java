@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
  * @author github.com/sefaunal
  * @since 2023-12-04
  */
-
 @Service
 @RequiredArgsConstructor
 public class LoginHistoryService {

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
  * @author github.com/sefaunal
  * @since 2023-12-04
  */
-
 @Repository
 public interface LoginHistoryRepository extends MongoRepository<LoginHistory, String> {
     Page<LoginHistory> getLoginRecordsByUserID(String userID, Pageable pageable);

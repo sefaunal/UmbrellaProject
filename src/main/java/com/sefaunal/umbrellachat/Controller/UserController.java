@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author sefaunal
+ * @author github.com/sefaunal
  * @since 2023-12-15
  */
-
 @RestController
 @RequiredArgsConstructor
 public class UserController {

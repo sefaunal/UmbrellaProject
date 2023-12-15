@@ -20,8 +20,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-18
- **/
-
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {

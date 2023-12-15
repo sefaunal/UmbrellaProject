@@ -18,8 +18,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-17
- **/
-
+ */
 @Component
 public class JWTAuthFilter extends OncePerRequestFilter {
     private final JWTService jwtService;

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
  * @author github.com/sefaunal
  * @since 2023-11-30
  */
-
 @Data
 @Builder
 @NoArgsConstructor

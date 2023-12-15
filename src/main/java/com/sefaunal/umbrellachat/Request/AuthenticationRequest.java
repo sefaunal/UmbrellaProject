@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 /**
  * @author github.com/sefaunal
  * @since 2023-09-18
- **/
-
+ */
 @Data
 @Builder
 @NoArgsConstructor
