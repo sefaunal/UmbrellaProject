@@ -1,9 +1,6 @@
 package com.sefaunal.umbrellachat.Model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,11 +14,8 @@ import java.util.List;
  * @author github.com/sefaunal
  * @since 2023-09-17
  */
-@Getter
-@Setter
+@Data
 @Document
-@NoArgsConstructor
-@AllArgsConstructor
 public class User implements UserDetails {
     @Id
     private String ID;

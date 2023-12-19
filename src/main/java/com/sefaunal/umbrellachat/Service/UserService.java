@@ -8,11 +8,8 @@ import com.sefaunal.umbrellachat.Response.MFAResponse;
 import com.sefaunal.umbrellachat.Util.CommonUtils;
 import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**

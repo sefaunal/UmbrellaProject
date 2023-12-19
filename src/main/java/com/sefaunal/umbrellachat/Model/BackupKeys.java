@@ -1,9 +1,6 @@
 package com.sefaunal.umbrellachat.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,11 +10,8 @@ import java.util.List;
  * @author github.com/sefaunal
  * @since 2023-12-18
  */
-@Getter
-@Setter
+@Data
 @Document
-@NoArgsConstructor
-@AllArgsConstructor
 public class BackupKeys {
     @Id
     private String ID;
