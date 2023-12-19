@@ -4,6 +4,7 @@ import com.sefaunal.umbrellachat.Model.User;
 import com.sefaunal.umbrellachat.Repository.UserRepository;
 import com.sefaunal.umbrellachat.Response.MFAResponse;
 import com.sefaunal.umbrellachat.Util.CommonUtils;
+import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +32,12 @@ public class UserService {
     public MFAResponse enableMFA() {
         User user = findUserByMail(CommonUtils.getUserInfo()).orElseThrow();
         user.setMfaEnabled(true);
-        user.setMfaSecret(mfaService.generateNewSecret());
+        user.setMfaSecret(EncryptionUtils.encryptSecretKey(mfaService.generateNewSecret()));
         saveUser(user);
 
         return MFAResponse.builder()
-                .secret(user.getMfaSecret())
-                .secretImageUri(mfaService.generateQrCodeImageUri(user.getMfaSecret()))
+                .secret(EncryptionUtils.decryptSecretKey(user.getMfaSecret()))
+                .secretImageUri(mfaService.generateQrCodeImageUri(EncryptionUtils.decryptSecretKey(user.getMfaSecret())))
                 .build();
     }
 

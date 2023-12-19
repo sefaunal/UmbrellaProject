@@ -64,6 +64,40 @@ public class EncryptionUtils {
         return decryptedRecoveryCodes;
     }
 
+    public static String encryptSecretKey(String mfaSecretKey) {
+        String encryptedSecretKey = null;
+
+        try {
+            SecretKey secretKey = generateSecretKey();
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            byte[] encryptedBytes = cipher.doFinal(mfaSecretKey.getBytes());
+            encryptedSecretKey = Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (Exception e) {
+            LOG.error("Error occurred during encrypting MFA Secret Key: " + e.getMessage());
+        }
+
+        return encryptedSecretKey;
+    }
+
+    public static String decryptSecretKey(String encryptedSecretKey) {
+        String decryptedSecretKey = null;
+
+        try {
+            SecretKey secretKey = generateSecretKey();
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedSecretKey);
+            decryptedSecretKey = new String(cipher.doFinal(encryptedBytes));
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
+
+        return decryptedSecretKey;
+    }
+
     private static SecretKey generateSecretKey() throws Exception {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), "salt".getBytes(), 1024, 256);

@@ -7,6 +7,7 @@ import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Request.VerificationRequest;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
 import com.sefaunal.umbrellachat.Model.User;
+import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +89,7 @@ public class AuthService {
         User user = userService.findUserByMail(userMail)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
 
-        if (!mfaService.isOtpValid(user.getMfaSecret(), request.getMfaCode())) {
+        if (!mfaService.isOtpValid(EncryptionUtils.decryptSecretKey(user.getMfaSecret()), request.getMfaCode())) {
             throw new BadCredentialsException("MFA Code is not valid!");
         }
 
