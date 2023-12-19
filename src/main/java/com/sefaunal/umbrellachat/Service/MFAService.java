@@ -9,6 +9,7 @@ import dev.samstevens.totp.exceptions.QrGenerationException;
 import dev.samstevens.totp.qr.QrData;
 import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.qr.ZxingPngQrGenerator;
+import dev.samstevens.totp.recovery.RecoveryCodeGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author github.com/sefaunal
@@ -59,5 +62,10 @@ public class MFAService {
         CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
 
         return codeVerifier.isValidCode(secret, code);
+    }
+
+    public List<String> generateRecoveryCodes() {
+        RecoveryCodeGenerator recoveryCodes = new RecoveryCodeGenerator();
+        return List.of(recoveryCodes.generateCodes(10));
     }
 }

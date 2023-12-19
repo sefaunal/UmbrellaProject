@@ -38,10 +38,6 @@ public class CommonUtils {
     }
 
     public static String getUserInfo() {
-        try {
-            return SecurityContextHolder.getContext().getAuthentication().getName();
-        } catch (Exception e) {
-            throw new NullPointerException(e.getMessage());
-        }
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

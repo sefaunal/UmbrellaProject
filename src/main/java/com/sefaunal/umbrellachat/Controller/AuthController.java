@@ -1,6 +1,7 @@
 package com.sefaunal.umbrellachat.Controller;
 
 import com.sefaunal.umbrellachat.Request.AuthenticationRequest;
+import com.sefaunal.umbrellachat.Request.RecoveryCodeRequest;
 import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Request.VerificationRequest;
 import com.sefaunal.umbrellachat.Service.AuthService;
@@ -41,6 +42,13 @@ public class AuthController {
     public ResponseEntity<?> verify2FACode(@Valid @RequestBody VerificationRequest verificationRequest,
                                            @Nonnull HttpServletRequest servletRequest,
                                            @Nonnull HttpSession httpSession) {
-        return ResponseEntity.ok(authService.verifyMFA(verificationRequest, servletRequest, httpSession));
+        return ResponseEntity.ok(authService.verifyTOTP(verificationRequest, servletRequest, httpSession));
+    }
+
+    @PostMapping("/verify/recoveryCode")
+    public ResponseEntity<?> verifyRecoveryCode(@Valid @RequestBody RecoveryCodeRequest recoveryCodeRequest,
+                                                @Nonnull HttpServletRequest servletRequest,
+                                                @Nonnull HttpSession httpSession) {
+        return ResponseEntity.ok(authService.verifyRecoveryCode(recoveryCodeRequest, servletRequest, httpSession));
     }
 }
