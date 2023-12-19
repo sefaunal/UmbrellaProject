@@ -1,7 +1,7 @@
 package com.sefaunal.umbrellachat.Handler;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.sefaunal.umbrellachat.Response.ErrorResponse;
+import com.sefaunal.umbrellachat.Response.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,7 +21,7 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<GenericResponse> handleValidationException(MethodArgumentNotValidException ex) {
         // Get the validation errors from the exception
         BindingResult bindingResult = ex.getBindingResult();
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -31,26 +31,26 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : fieldErrors) {
             errorMessages.add(fieldError.getField() + " " + fieldError.getDefaultMessage());
         }
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "Validation Error(s): " + errorMessages);
+        GenericResponse GenericResponse = new GenericResponse(400, "Validation Error(s): " + errorMessages);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(GenericResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleCredentialException(BadCredentialsException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    public ResponseEntity<GenericResponse> handleCredentialException(BadCredentialsException ex) {
+        GenericResponse GenericResponse = new GenericResponse(403, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(GenericResponse);
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    public ResponseEntity<GenericResponse> handleTokenExpiredException(TokenExpiredException ex) {
+        GenericResponse GenericResponse = new GenericResponse(403, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(GenericResponse);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ResponseEntity<GenericResponse> handleGeneralException(Exception ex) {
+        GenericResponse GenericResponse = new GenericResponse(500, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(GenericResponse);
     }
 }

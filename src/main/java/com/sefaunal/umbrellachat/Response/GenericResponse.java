@@ -1,27 +1,23 @@
 package com.sefaunal.umbrellachat.Response;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.http.HttpStatus;
-
-import java.time.LocalDateTime;
+import lombok.Data;
+import java.time.Instant;
 
 /**
  * @author github.com/sefaunal
  * @since 2023-12-19
  */
-@Getter
-@Setter
+@Data
 public class GenericResponse {
-    private HttpStatus status;
+    private int status;
 
     private String message;
 
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
-    public GenericResponse(String message) {
-        this.status = HttpStatus.OK;
+    public GenericResponse(int status, String message) {
+        this.status = status;
         this.message = message;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 }

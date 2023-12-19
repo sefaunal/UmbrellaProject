@@ -8,8 +8,11 @@ import com.sefaunal.umbrellachat.Response.MFAResponse;
 import com.sefaunal.umbrellachat.Util.CommonUtils;
 import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -66,7 +69,7 @@ public class UserService {
         user.setMfaEnabled(true);
         saveUser(user);
 
-        return new GenericResponse("MFA has been successfully enabled.");
+        return new GenericResponse(200, "MFA has been successfully enabled.");
     }
 
     public GenericResponse disableMFA() {
@@ -74,6 +77,7 @@ public class UserService {
         user.setMfaEnabled(false);
         user.setMfaSecret(null);
         saveUser(user);
-        return new GenericResponse("MFA has been successfully disabled.");
+
+        return new GenericResponse(200, "MFA has been successfully disabled.");
     }
 }
