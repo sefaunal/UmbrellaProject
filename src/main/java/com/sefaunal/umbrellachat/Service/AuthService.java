@@ -1,20 +1,29 @@
 package com.sefaunal.umbrellachat.Service;
 
+import com.sefaunal.umbrellachat.Model.BackupKeys;
 import com.sefaunal.umbrellachat.Request.AuthenticationRequest;
+import com.sefaunal.umbrellachat.Request.RecoveryCodeRequest;
 import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Request.VerificationRequest;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
 import com.sefaunal.umbrellachat.Model.User;
+import com.sefaunal.umbrellachat.Response.GenericResponse;
+import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -35,6 +44,8 @@ public class AuthService {
     private final LoginHistoryService loginHistoryService;
 
     private final MFAService mfaService;
+
+    private final BackupKeysService backupKeysService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         User user = new User();
@@ -74,7 +85,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthenticationResponse verifyMFA(VerificationRequest request, HttpServletRequest servletRequest, HttpSession httpSession) {
+    public AuthenticationResponse verifyTOTP(VerificationRequest request, HttpServletRequest servletRequest, HttpSession httpSession) {
         String userMail = (String) httpSession.getAttribute("authenticatedUser");
         if (userMail == null) {
             throw new IllegalStateException("User is not authenticated");
@@ -83,7 +94,7 @@ public class AuthService {
         User user = userService.findUserByMail(userMail)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
 
-        if (!mfaService.isOtpValid(user.getMfaSecret(), request.getMfaCode())) {
+        if (!mfaService.isOtpValid(EncryptionUtils.decryptSecretKey(user.getMfaSecret()), request.getMfaCode())) {
             throw new BadCredentialsException("MFA Code is not valid!");
         }
 
@@ -95,4 +106,52 @@ public class AuthService {
                 .mfaEnabled(user.isMfaEnabled())
                 .build();
     }
+
+    public AuthenticationResponse verifyRecoveryCode(RecoveryCodeRequest recoveryCodeRequest,
+                                                     HttpServletRequest servletRequest,
+                                                     HttpSession httpSession) {
+        String userMail = (String) httpSession.getAttribute("authenticatedUser");
+        if (userMail == null) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+
+        User user = userService.findUserByMail(userMail)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
+
+        BackupKeys backupKeys = backupKeysService.obtainEncryptedRecoveryCodes(userMail);
+        List<String> decryptedBackupKeys = backupKeysService.decryptRecoveryKeys(userMail).getRecoveryCodes();
+
+        boolean userAuthenticated = false;
+        for (int i = 0; i < decryptedBackupKeys.size(); i++) {
+            if (recoveryCodeRequest.getRecoveryCode().equals(decryptedBackupKeys.get(i))) {
+                backupKeys.getRecoveryCodes().remove(i);
+                userAuthenticated = true;
+                break;
+            }
+        }
+
+        if (!userAuthenticated) {
+            throw new BadCredentialsException("Recovery Code is not valid!");
+        }
+
+        backupKeysService.updateRecoveryCodesState(backupKeys);
+
+        httpSession.invalidate();
+        String JWT = jwtService.generateToken(user);
+        CompletableFuture.runAsync(() -> loginHistoryService.saveLoginHistory(servletRequest, userMail));
+        return AuthenticationResponse.builder()
+                .token(JWT)
+                .mfaEnabled(user.isMfaEnabled())
+                .build();
+    }
+
+    public GenericResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+
+        return new GenericResponse(200, "Successfully Logged out.");
+    }
+
 }

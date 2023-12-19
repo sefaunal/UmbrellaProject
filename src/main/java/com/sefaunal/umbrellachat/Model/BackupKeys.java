@@ -4,23 +4,24 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author github.com/sefaunal
- * @since 2023-12-04
+ * @since 2023-12-18
  */
 @Data
 @Document
-public class LoginHistory {
+public class BackupKeys {
     @Id
     private String ID;
 
-    private String environment;
-
-    private String IPAddress;
-
-    private LocalDateTime timestamp;
+    private List<String> recoveryCodes;
 
     private String userID;
+
+    public BackupKeys(List<String> encryptedRecoveryCodes, String userID) {
+        this.recoveryCodes = encryptedRecoveryCodes;
+        this.userID = userID;
+    }
 }

@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: "Credentials / URI"
-      database: "DB Name"
+      uri: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
+      database: "umbrella"
 
   banner:
     location: banner.txt

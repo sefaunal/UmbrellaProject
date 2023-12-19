@@ -70,6 +70,12 @@
 			<version>1.7.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.82</version>
+		</dependency>
+
 		<!--		Auth0 JWT Implementation Start		-->
 		<dependency>
 			<groupId>com.auth0</groupId>

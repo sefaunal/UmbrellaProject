@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,9 +25,10 @@ public class LoginHistoryService {
     private final UserService userService;
 
     public void saveLoginHistory(HttpServletRequest request, String userMail) {
-        LoginHistory loginHistory = new LoginHistory();
+        User user = userService.findUserByMail(userMail)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
 
-        User user = userService.findUserByMail(userMail).orElseThrow();
+        LoginHistory loginHistory = new LoginHistory();
 
         loginHistory.setUserID(user.getID());
         loginHistory.setTimestamp(LocalDateTime.now());
