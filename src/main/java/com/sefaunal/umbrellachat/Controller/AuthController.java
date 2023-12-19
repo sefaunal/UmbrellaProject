@@ -7,6 +7,7 @@ import com.sefaunal.umbrellachat.Request.VerificationRequest;
 import com.sefaunal.umbrellachat.Service.AuthService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,11 @@ public class AuthController {
                                                 @Nonnull HttpServletRequest servletRequest,
                                                 @Nonnull HttpSession httpSession) {
         return ResponseEntity.ok(authService.verifyRecoveryCode(recoveryCodeRequest, servletRequest, httpSession));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@Nonnull HttpServletRequest request,
+                                    @Nonnull HttpServletResponse response) {
+        return ResponseEntity.ok(authService.logout(request, response));
     }
 }

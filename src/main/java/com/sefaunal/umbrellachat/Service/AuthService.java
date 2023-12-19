@@ -7,15 +7,20 @@ import com.sefaunal.umbrellachat.Request.RegisterRequest;
 import com.sefaunal.umbrellachat.Request.VerificationRequest;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
 import com.sefaunal.umbrellachat.Model.User;
+import com.sefaunal.umbrellachat.Response.GenericResponse;
 import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -138,6 +143,15 @@ public class AuthService {
                 .token(JWT)
                 .mfaEnabled(user.isMfaEnabled())
                 .build();
+    }
+
+    public GenericResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+
+        return new GenericResponse(200, "Successfully Logged out.");
     }
 
 }
