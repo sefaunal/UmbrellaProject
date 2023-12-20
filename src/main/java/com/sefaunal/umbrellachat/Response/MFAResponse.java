@@ -11,5 +11,6 @@ import lombok.Data;
 @Builder
 public class MFAResponse {
     private String secret;
+
     private String secretImageUri;
 }
