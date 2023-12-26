@@ -34,6 +34,12 @@ public class User implements UserDetails {
 
     private boolean mfaEnabled;
 
+    private boolean oauth2Account;
+
+    private String oauth2ID;
+
+    private String oauth2Provider;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));

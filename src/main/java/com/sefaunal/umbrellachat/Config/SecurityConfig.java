@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/**")
+                        .disable()
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**", "/swagger/**", "/swagger-docs/**", "/swagger-ui/**").permitAll()
@@ -38,7 +38,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/api/auth/authenticate/oauth2")
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/api/auth/authenticate/oauth2"))
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/api/auth/authenticate/redirect"))
+                );
         return http.build();
     }
 }

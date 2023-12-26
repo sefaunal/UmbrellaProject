@@ -1,4 +1,12 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: Iv1.a59f840bb156d347
+            client-secret: 1f64a5de506a8f61cb6ff23a1d94dbedfa2d37ac
+            redirect-uri: http://localhost:8080/api/auth/oauth2/redirect
   data:
     mongodb:
       uri: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"

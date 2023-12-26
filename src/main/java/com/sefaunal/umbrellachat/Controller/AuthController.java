@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * @author github.com/sefaunal
@@ -39,7 +41,12 @@ public class AuthController {
         return ResponseEntity.ok(authService.authenticate(authenticationRequest, servletRequest, httpSession));
     }
 
-    @PostMapping("verify")
+    @GetMapping("/oauth2/redirect")
+    public ResponseEntity<?> authenticate(HttpServletRequest servletRequest, @RequestParam String code) {
+        return ResponseEntity.ok(authService.authenticate(servletRequest, code));
+    }
+
+    @PostMapping("verify/totp")
     public ResponseEntity<?> verify2FACode(@Valid @RequestBody VerificationRequest verificationRequest,
                                            @Nonnull HttpServletRequest servletRequest,
                                            @Nonnull HttpSession httpSession) {

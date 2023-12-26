@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2023-09-18
  */
 @RestController
-@RequestMapping("/api/demo-controller")
+@RequestMapping("/api/demo")
 public class DemoController {
-    @GetMapping
+    @GetMapping("/home")
     public ResponseEntity<String> sayHello() {
         return ResponseEntity.ok("Hello from secured endpoint");
     }

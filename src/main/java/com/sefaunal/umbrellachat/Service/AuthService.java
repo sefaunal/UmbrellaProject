@@ -47,6 +47,8 @@ public class AuthService {
 
     private final BackupKeysService backupKeysService;
 
+    private final OAuth2Service oAuth2Service;
+
     public AuthenticationResponse register(RegisterRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
@@ -58,7 +60,11 @@ public class AuthService {
         user.setMfaSecret(null);
         userService.saveUser(user);
         String JWT = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(JWT).build();
+        return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
+    }
+
+    public AuthenticationResponse authenticate(HttpServletRequest servletRequest, String token) {
+        return oAuth2Service.authenticateViaGithub(servletRequest, token);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletRequest servletRequest, HttpSession httpSession) {
