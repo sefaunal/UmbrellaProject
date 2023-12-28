@@ -1,5 +1,6 @@
 package com.sefaunal.umbrellachat.Service;
 
+import com.sefaunal.umbrellachat.Exception.OkHttpRequestException;
 import com.sefaunal.umbrellachat.Model.OAuth2UserDetails;
 import com.sefaunal.umbrellachat.Model.User;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
@@ -163,7 +164,7 @@ public class OAuth2Service {
             LOG.error("Failed to get an Access Token from Google API: " + e.getMessage());
         }
 
-        throw new RuntimeException("Failed to get an Access Token from Google API");
+        throw new OkHttpRequestException("Failed to get an Access Token from Google API");
     }
 
     private OAuth2UserDetails getGoogleUserDetails(String accessToken) {
@@ -195,7 +196,7 @@ public class OAuth2Service {
             LOG.error("Failed to fetch user details from Google API: " + e.getMessage());
         }
 
-        throw new RuntimeException("Failed to fetch user details from Google API");
+        throw new OkHttpRequestException("Failed to fetch user details from Google API");
     }
 
     private String getGithubAccessToken(String token) {
@@ -236,7 +237,7 @@ public class OAuth2Service {
             LOG.error("Failed to get an Access Token from GitHub API: " + e.getMessage());
         }
 
-        throw new RuntimeException("Failed to get an Access Token from GitHub API");
+        throw new OkHttpRequestException("Failed to get an Access Token from GitHub API");
     }
 
     private OAuth2UserDetails getGithubUserDetails(String accessToken) {
@@ -273,7 +274,7 @@ public class OAuth2Service {
             LOG.error("Failed to fetch user details from GitHub API: " + e.getMessage());
         }
 
-        throw new RuntimeException("Failed to fetch user details from GitHub API");
+        throw new OkHttpRequestException("Failed to fetch user details from GitHub API");
     }
 
     private String getGithubUserEmail(String accessToken) {
@@ -310,6 +311,6 @@ public class OAuth2Service {
             LOG.error("Failed to fetch email from GitHub API: " + e.getMessage());
         }
 
-        throw new RuntimeException("Failed to fetch email from GitHub API");
+        throw new OkHttpRequestException("Failed to fetch email from GitHub API");
     }
 }
