@@ -1,4 +1,16 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 629559373199-5fvfln8kt22rd0m9ioqc7i06jhlt9a69.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:8080/api/auth/oauth2/redirect/google
+          github:
+            client-id: Iv1.a59f840bb156d347
+            client-secret: 1f64a5de506a8f61cb6ff23a1d94dbedfa2d37ac
+            redirect-uri: http://localhost:8080/api/auth/oauth2/redirect/github
   data:
     mongodb:
       uri: "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2"
@@ -21,4 +33,12 @@ umbrella:
   variables:
     jwt:
       expire:
-        days: 7
+        days: 1
+    url:
+      github:
+        access_token: "https://github.com/login/oauth/access_token"
+        user_details: "https://api.github.com/user"
+        user_email: "https://api.github.com/user/emails"
+      google:
+        access_token: "https://www.googleapis.com/oauth2/v4/token"
+        user_details: "https://www.googleapis.com/oauth2/v1/userinfo"

@@ -31,6 +31,10 @@ public class UserService {
         return userRepository.findByEmail(userMail);
     }
 
+    public Optional<User> findByOauth2ID(String findByOauth2ID) {
+        return userRepository.findByOauth2ID(findByOauth2ID);
+    }
+
     public MFAResponse generateSecretKey() {
         User user = findUserByMail(CommonUtils.getUserInfo()).orElseThrow();
 
