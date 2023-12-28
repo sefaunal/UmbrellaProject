@@ -1,12 +1,12 @@
 package com.sefaunal.umbrellachat.Service;
 
+import com.sefaunal.umbrellachat.Model.OAuth2UserDetails;
 import com.sefaunal.umbrellachat.Model.User;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,8 +18,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.FormBody;
 import okhttp3.Response;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,6 +36,30 @@ public class OAuth2Service {
     @Value("${spring.security.oauth2.client.registration.github.redirect-uri}")
     private String GITHUB_REDIRECT_URL;
 
+    @Value("${umbrella.variables.url.github.access_token}")
+    private String GITHUB_ACCESS_TOKEN_URL;
+
+    @Value("${umbrella.variables.url.github.user_details}")
+    private String GITHUB_USER_DETAIL_URL;
+
+    @Value("${umbrella.variables.url.github.user_email}")
+    private String GITHUB_USER_EMAIL_URL;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String GOOGLE_CLIENT_ID;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String GOOGLE_SECRET;
+
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String GOOGLE_REDIRECT_URL;
+
+    @Value("${umbrella.variables.url.google.access_token}")
+    private String GOOGLE_ACCESS_TOKEN_URL;
+
+    @Value("${umbrella.variables.url.google.user_details}")
+    private String GOOGLE_USER_DETAIL_URL;
+
     private final LoginHistoryService loginHistoryService;
 
     private final UserService userService;
@@ -52,79 +74,131 @@ public class OAuth2Service {
         this.jwtService = jwtService;
     }
 
-    public AuthenticationResponse authenticateViaGithub(HttpServletRequest servletRequest, String token) {
-        String accessToken = getGithubAccessToken(token);
-        String email = getGithubUserEmail(accessToken);
-        Map<String, String> userDetails = getGithubUserDetails(accessToken);
+    public AuthenticationResponse authenticateOAuth2(HttpServletRequest servletRequest, String provider, String token) {
+        String accessToken;
+        OAuth2UserDetails userDetails;
 
-        // Throw error if details about user couldn't be fetched from GitHub
-        if (email == null || userDetails.isEmpty()) {
-            throw new BadCredentialsException("Error occurred during authentication!");
+        // Get details about the user based on the OAuth2 provider
+        if (provider.equalsIgnoreCase("GitHub")) {
+            accessToken = getGithubAccessToken(token);
+            userDetails = getGithubUserDetails(accessToken);
+        } else if (provider.equalsIgnoreCase("Google")) {
+            accessToken = getGoogleAccessToken(token);
+            userDetails = getGoogleUserDetails(accessToken);
+        } else {
+            throw new IllegalArgumentException("Invalid OAuth2 provider specified!");
         }
 
-        // Update user email if their id match but their email does not
-        Optional<User> userByOAuth2 = userService.findByOauth2ID(userDetails.get("id"));
-        if (userByOAuth2.isPresent() && !userByOAuth2.get().getEmail().equals(email)) {
-            return updateUserViaGithubCredentials(email, userByOAuth2.get());
+        // Authenticate the user if they already have an account on the database
+        Optional<User> user = userService.findByOauth2ID(userDetails.getOAuth2ID());
+        if (user.isPresent()) {
+            String JWT = jwtService.generateToken(user.get());
+
+            CompletableFuture.runAsync(() -> loginHistoryService.saveLoginHistory(servletRequest, user.get().getEmail()));
+            return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
         }
 
-        // Create a new user on the database if email is not in use
-        if (userService.findUserByMail(email).isEmpty()) {
-            return createUserViaGithubCredentials(email, userDetails);
+        // Throw error if the email is already in use
+        if (userService.findUserByMail(userDetails.getEmail()).isPresent()) {
+            throw new OAuth2AuthenticationException("Email is already in use with different authentication method!");
         }
 
-        // Fetch user from the database if email is already in use
-        User user = userService.findUserByMail(email).orElseThrow();
-
-        // Throw error if user is not an OAuth user and the email is already in use
-        if (!user.isOauth2Account()) {
-            throw new BadCredentialsException("Email is already in use with different authentication method!");
-        }
-
-        // Throw error if user's id fetched from GitHub doesn't match with our own record
-        if (!user.getOauth2ID().equals(userDetails.get("id"))) {
-            throw new OAuth2AuthenticationException("Verification failed");
-        }
-
-        String JWT = jwtService.generateToken(user);
-
-        CompletableFuture.runAsync(() -> loginHistoryService.saveLoginHistory(servletRequest, user.getEmail()));
-        return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
+        return createUserWithOAuthCredentials(userDetails);
     }
 
-    private AuthenticationResponse updateUserViaGithubCredentials(String email, User user) {
-        user.setEmail(email);
-        userService.saveUser(user);
-
-        String JWT = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
-    }
-
-    private AuthenticationResponse createUserViaGithubCredentials(String email, Map<String, String> userDetails) {
+    private AuthenticationResponse createUserWithOAuthCredentials(OAuth2UserDetails userDetails) {
         User user = new User();
-        user.setEmail(email);
-        user.setFirstName(userDetails.get("login"));
-        user.setLastName(null);
-        user.setPassword(null);
+        user.setEmail(userDetails.getEmail());
+        user.setFirstName(userDetails.getFirstName());
+        user.setLastName(userDetails.getLastName());
         user.setRole("OAUTH2_USER");
+        user.setProfilePictureURI(userDetails.getProfilePictureURI());
         user.setMfaEnabled(false);
-        user.setMfaSecret(null);
         user.setOauth2Account(true);
-        user.setOauth2ID(userDetails.get("id"));
-        user.setOauth2Provider("Github");
+        user.setOauth2ID(userDetails.getOAuth2ID());
+        user.setOauth2Provider(userDetails.getOAuth2Provider());
         userService.saveUser(user);
 
         String JWT = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
+    }
+
+    private String getGoogleAccessToken(String token) {
+        // Set the request headers
+        Headers headers = new Headers.Builder()
+                .add("Content-Type", "application/json")
+                .add("Accept", "application/json")
+                .build();
+
+        // Set the request body
+        RequestBody requestBody = new FormBody.Builder()
+                .add("code", token)
+                .add("client_id", GOOGLE_CLIENT_ID)
+                .add("client_secret", GOOGLE_SECRET)
+                .add("redirect_uri", GOOGLE_REDIRECT_URL)
+                .add("grant_type", "authorization_code")
+                .build();
+
+        // Create the POST request
+        Request request = new Request.Builder()
+                .url(GOOGLE_ACCESS_TOKEN_URL)
+                .headers(headers)
+                .post(requestBody)
+                .build();
+
+        // Create the OkHttp client
+        OkHttpClient client = new OkHttpClient();
+
+        // Send the request and get the response
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : null;
+
+            // Parse the JSON response using Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode responseJson = objectMapper.readTree(responseBody);
+
+            return responseJson.get("access_token").asText();
+        } catch (Exception e) {
+            LOG.error("Failed to get an Access Token from Google API: " + e.getMessage());
+        }
+
+        throw new RuntimeException("Failed to get an Access Token from Google API");
+    }
+
+    private OAuth2UserDetails getGoogleUserDetails(String accessToken) {
+        OkHttpClient client = new OkHttpClient();
+
+        String url = GOOGLE_USER_DETAIL_URL + "?access_token=" + accessToken;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Accept", "application/json")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : null;
+
+            // Parse the JSON response using Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode responseJson = objectMapper.readTree(responseBody);
+
+            return OAuth2UserDetails.builder()
+                    .oAuth2ID(responseJson.get("id").asText())
+                    .firstName(responseJson.get("given_name").asText())
+                    .lastName(responseJson.get("family_name").asText())
+                    .profilePictureURI(responseJson.get("picture").asText())
+                    .email(responseJson.get("email").asText())
+                    .oAuth2Provider("Google")
+                    .build();
+        } catch (Exception e) {
+            LOG.error("Failed to fetch user details from Google API: " + e.getMessage());
+        }
+
+        throw new RuntimeException("Failed to fetch user details from Google API");
     }
 
     private String getGithubAccessToken(String token) {
-        String accessToken = null;
-
-        // Set the request URL
-        String url = "https://github.com/login/oauth/access_token";
-
         // Set the request headers
         Headers headers = new Headers.Builder()
                 .add("Content-Type", "application/json")
@@ -141,7 +215,7 @@ public class OAuth2Service {
 
         // Create the POST request
         Request request = new Request.Builder()
-                .url(url)
+                .url(GITHUB_ACCESS_TOKEN_URL)
                 .headers(headers)
                 .post(requestBody)
                 .build();
@@ -157,20 +231,15 @@ public class OAuth2Service {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode responseJson = objectMapper.readTree(responseBody);
 
-            accessToken = responseJson.get("access_token").asText();
+            return responseJson.get("access_token").asText();
         } catch (Exception e) {
-            LOG.error("An error occurred: ", e);
+            LOG.error("Failed to get an Access Token from GitHub API: " + e.getMessage());
         }
 
-        return accessToken;
+        throw new RuntimeException("Failed to get an Access Token from GitHub API");
     }
 
-    private Map<String, String> getGithubUserDetails(String accessToken) {
-        Map<String, String> oauth2Details = new HashMap<>();
-
-        // Set the request URL
-        String url = "https://api.github.com/user";
-
+    private OAuth2UserDetails getGithubUserDetails(String accessToken) {
         // Set the request headers
         Headers headers = new Headers.Builder()
                 .add("Accept", "application/json")
@@ -179,7 +248,7 @@ public class OAuth2Service {
 
         // Create the GET request
         Request request = new Request.Builder()
-                .url(url)
+                .url(GITHUB_USER_DETAIL_URL)
                 .headers(headers)
                 .build();
 
@@ -194,21 +263,20 @@ public class OAuth2Service {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode responseJson = objectMapper.readTree(responseBody);
 
-            oauth2Details.put("id", responseJson.get("id").asText());
-            oauth2Details.put("login", responseJson.get("login").asText());
+            return OAuth2UserDetails.builder()
+                    .oAuth2ID(responseJson.get("id").asText())
+                    .firstName(responseJson.get("login").asText())
+                    .email(getGithubUserEmail(accessToken))
+                    .oAuth2Provider("GitHub")
+                    .build();
         } catch (Exception e) {
-            LOG.error("An error occurred: ", e);
+            LOG.error("Failed to fetch user details from GitHub API: " + e.getMessage());
         }
 
-        return oauth2Details;
+        throw new RuntimeException("Failed to fetch user details from GitHub API");
     }
 
     private String getGithubUserEmail(String accessToken) {
-        String primaryEmail = null;
-
-        // Set the request URL
-        String url = "https://api.github.com/user/emails";
-
         // Set the request headers
         Headers headers = new Headers.Builder()
                 .add("Accept", "application/json")
@@ -217,7 +285,7 @@ public class OAuth2Service {
 
         // Create the GET request
         Request request = new Request.Builder()
-                .url(url)
+                .url(GITHUB_USER_EMAIL_URL)
                 .headers(headers)
                 .build();
 
@@ -235,14 +303,13 @@ public class OAuth2Service {
             // Find the primary email
             for (JsonNode jsonNode : responseJson) {
                 if (jsonNode.get("primary").asBoolean()) {
-                    primaryEmail = jsonNode.get("email").asText();
-                    break;  // Exit the loop once we find the primary email
+                    return jsonNode.get("email").asText();
                 }
             }
         } catch (Exception e) {
-            LOG.error("An error occurred: ", e);
+            LOG.error("Failed to fetch email from GitHub API: " + e.getMessage());
         }
 
-        return primaryEmail;
+        throw new RuntimeException("Failed to fetch email from GitHub API");
     }
 }

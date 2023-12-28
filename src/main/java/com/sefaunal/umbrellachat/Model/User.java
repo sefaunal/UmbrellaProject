@@ -30,6 +30,8 @@ public class User implements UserDetails {
 
     private String password;
 
+    private String profilePictureURI;
+
     private String mfaSecret;
 
     private boolean mfaEnabled;

@@ -63,8 +63,8 @@ public class AuthService {
         return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
     }
 
-    public AuthenticationResponse authenticate(HttpServletRequest servletRequest, String token) {
-        return oAuth2Service.authenticateViaGithub(servletRequest, token);
+    public AuthenticationResponse authenticate(HttpServletRequest servletRequest, String provider, String token) {
+        return oAuth2Service.authenticateOAuth2(servletRequest, provider, token);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletRequest servletRequest, HttpSession httpSession) {
