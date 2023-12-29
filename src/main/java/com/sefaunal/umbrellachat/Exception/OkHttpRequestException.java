@@ -8,8 +8,4 @@ public class OkHttpRequestException extends RuntimeException {
     public OkHttpRequestException(String message) {
         super(message);
     }
-
-    public OkHttpRequestException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

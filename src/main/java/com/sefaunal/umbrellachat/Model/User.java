@@ -20,6 +20,8 @@ public class User implements UserDetails {
     @Id
     private String ID;
 
+    private String username;
+
     private String firstName;
 
     private String lastName;
