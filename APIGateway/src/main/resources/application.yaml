@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: API Gateway
+  banner:
+    location: banner.txt
+  cloud:
+    gateway:
+      routes:
+        - id: security_route
+          uri: http://localhost:8081/register
+          predicates:
+            - Path=/register
