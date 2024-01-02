@@ -18,7 +18,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
@@ -74,7 +73,7 @@ public class AuthService {
                         request.getPassword()
                 )
         );
-        User user = userService.findUserByMail(request.getEmail()).orElseThrow();
+        User user = userService.findUserByMail(request.getEmail());
 
         if (user.isMfaEnabled()) {
             httpSession.setAttribute("authenticatedUser", request.getEmail());
@@ -97,8 +96,7 @@ public class AuthService {
             throw new IllegalStateException("User is not authenticated");
         }
 
-        User user = userService.findUserByMail(userMail)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
+        User user = userService.findUserByMail(userMail);
 
         if (!mfaService.isOtpValid(EncryptionUtils.decryptSecretKey(user.getMfaSecret()), request.getMfaCode())) {
             throw new BadCredentialsException("MFA Code is not valid!");
@@ -121,8 +119,7 @@ public class AuthService {
             throw new IllegalStateException("User is not authenticated");
         }
 
-        User user = userService.findUserByMail(userMail)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
+        User user = userService.findUserByMail(userMail);
 
         BackupKeys backupKeys = backupKeysService.obtainEncryptedRecoveryCodes(userMail);
         List<String> decryptedBackupKeys = backupKeysService.decryptRecoveryKeys(userMail).getRecoveryCodes();

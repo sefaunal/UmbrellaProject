@@ -4,6 +4,7 @@ import com.sefaunal.umbrellachat.Exception.OkHttpRequestException;
 import com.sefaunal.umbrellachat.Model.OAuth2UserDetails;
 import com.sefaunal.umbrellachat.Model.User;
 import com.sefaunal.umbrellachat.Response.AuthenticationResponse;
+import com.sefaunal.umbrellachat.Util.RandomUsernameGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +101,7 @@ public class OAuth2Service {
         }
 
         // Throw error if the email is already in use
-        if (userService.findUserByMail(userDetails.getEmail()).isPresent()) {
+        if (userService.isEmailInUse(userDetails.getEmail())) {
             throw new OAuth2AuthenticationException("Email is already in use with different authentication method!");
         }
 
@@ -109,6 +110,7 @@ public class OAuth2Service {
 
     private AuthenticationResponse createUserWithOAuthCredentials(OAuth2UserDetails userDetails) {
         User user = new User();
+        user.setUsername(generateUniqueUsername());
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
@@ -123,6 +125,16 @@ public class OAuth2Service {
         String JWT = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder().token(JWT).mfaEnabled(false).build();
+    }
+
+    private String generateUniqueUsername() {
+        String username = RandomUsernameGenerator.generateRandomUsername();
+
+        while (userService.isUsernameInUse(username)) {
+            username = RandomUsernameGenerator.generateRandomUsername();
+        }
+
+        return username;
     }
 
     private String getGoogleAccessToken(String token) {

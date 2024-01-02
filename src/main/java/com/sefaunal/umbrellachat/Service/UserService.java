@@ -8,6 +8,7 @@ import com.sefaunal.umbrellachat.Response.MFAResponse;
 import com.sefaunal.umbrellachat.Util.CommonUtils;
 import com.sefaunal.umbrellachat.Util.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,16 +28,33 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Optional<User> findUserByMail(String userMail) {
-        return userRepository.findByEmail(userMail);
+    public User findUserByMail(String userMail) {
+        return userRepository.findByEmail(userMail)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with " + userMail));
     }
 
     public Optional<User> findByOauth2ID(String findByOauth2ID) {
         return userRepository.findByOauth2ID(findByOauth2ID);
     }
 
+    public boolean isEmailFree(String email) {
+        return userRepository.findByEmail(email).isEmpty();
+    }
+
+    public boolean isEmailInUse(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public boolean isUsernameFree(String username) {
+        return userRepository.findByUsername(username).isEmpty();
+    }
+
+    public boolean isUsernameInUse(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
     public MFAResponse generateSecretKey() {
-        User user = findUserByMail(CommonUtils.getUserInfo()).orElseThrow();
+        User user = findUserByMail(CommonUtils.getUserInfo());
 
         // Generate a new secret key and show it to the user
         String secretKey = mfaService.generateNewSecret();
@@ -54,7 +72,7 @@ public class UserService {
     }
 
     public GenericResponse enableMFA(VerificationRequest verificationRequest) {
-        User user = findUserByMail(CommonUtils.getUserInfo()).orElseThrow();
+        User user = findUserByMail(CommonUtils.getUserInfo());
 
         // Decrypt the stored MFA secret key
         String encryptedSecretKey = user.getMfaSecret();
@@ -74,7 +92,7 @@ public class UserService {
     }
 
     public GenericResponse disableMFA() {
-        User user = findUserByMail(CommonUtils.getUserInfo()).orElseThrow();
+        User user = findUserByMail(CommonUtils.getUserInfo());
         user.setMfaEnabled(false);
         user.setMfaSecret(null);
         saveUser(user);
