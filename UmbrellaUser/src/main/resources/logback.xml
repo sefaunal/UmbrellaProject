@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_DIR" value="${user.home}/UmbrellaLogs/Eureka" />
+    <property name="LOG_DIR" value="${user.home}/UmbrellaLogs/User" />
     <property name="MAX_FILE_SIZE" value="10MB" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -9,9 +9,9 @@
     </appender>1
 
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/eureka.log</file>
+        <file>${LOG_DIR}/user.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/archive/eureka-%d{yyyy.MM.dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/archive/user-%d{yyyy.MM.dd}.log</fileNamePattern>
             <maxHistory>180</maxHistory>
         </rollingPolicy>
         <encoder>
